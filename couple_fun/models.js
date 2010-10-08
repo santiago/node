@@ -12,6 +12,7 @@ mongoose.model('Game', {
 		 {locations:[['game_location_id', 'description']]}, 
 		 {category:[['category_id', 'name']]},
 		 'warnings',
+		 'tips',
 		 'release_date', 
 		 'updated_at'],
     

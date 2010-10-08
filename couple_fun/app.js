@@ -2,11 +2,16 @@ require.paths.unshift('../support/mongoose');
 
 var express = require('../support/express/lib/express'),
          fs = require('fs'),
-         db = require('./models');
+         db = require('./models'),
+        sys = require('sys');
 
 var app = module.exports = express.createServer();
+app.configure(function(){
+    app.use(express.bodyDecoder());
+});
 
 module.exports.db= db;
+module.exports.sys= sys;
 module.exports.populate_games= populate_games;
 
 require('./main');
@@ -41,7 +46,7 @@ function populate_games(callback) {
 		game.locations.push({game_location_id: 1, description: location});
 	    });
 	    
-	    game.category= [{category_id: 1, name: row[1].trim()}];
+	    game.category= [{category_id: 1, name: row[1].trim().toLowerCase()}];
 	    game.release_date= new Date();
 	    game.save(function(a) {
 	    });
