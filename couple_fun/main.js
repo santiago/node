@@ -7,9 +7,27 @@ function clean_for_json(data) {
 var app = module.parent.exports;
 var sys= app.sys;
 var db= app.db;
+var ObjectID= app.db.ObjectID;
 
 var Game= db.model('Game');
 var GameLocation= db.model('GameLocation');
+
+function set_game(game, game_data) {
+    game.title = game_data.title;
+    game.synopsis= game_data.synopsis;
+    game.author= game_data.author;
+    game.rules= game_data.rules;
+    game.warnings= game_data.warning;
+    game.tips= game_data.tips;
+    game.category= [{category_id: 1, name: game_data.category.trim().toLowerCase()}];
+    game.locations= (function(situations) {
+	var array=[];
+	for (var i in situations) {
+            array.push({game_location_id: new ObjectID(situations[i].id), description: situations[i].description.trim().toLowerCase()});
+	}
+	return array;
+    })(game_data.situations);
+};
 
 app.get('/admin/couple_fun/populate_games', function(req, res) {
     app.populate_games(function() {
@@ -19,35 +37,24 @@ app.get('/admin/couple_fun/populate_games', function(req, res) {
     });
 });
 
-app.post('/admin/couple_fun/games', function(req, res) {
+app.put('/admin/couple_fun/games', function(req, res) {
+    var game= {};
     var game_data= req.param('game');
 
+    Game.findById(game_data.id, function(game) {
+    	set_game(game, game_data);
+    	game.save(function(a){});
+    });    
+    res.send([]);
+
+});
+
+app.post('/admin/couple_fun/games', function(req, res) {
+    var game_data= req.param('game');
     var game = new Game();
-    game.title = game_data.title;
-    game.synopsis= game_data.synopsis;
-    game.author= game_data.author;
-    game.rules= game_data.rules;
-    game.warnings= game_data.warning;
-    game.tips= game_data.tips;
-    game.category= [{category_id: 1, name: game_data.category.trim().toLowerCase()}];
-    game.release_date= new Date();
-    game.locations= (function(situations) {
-	var array=[];
-	for (var i in situations) {
-	    array.push({game_location_id: situations[i].id, description: situations[i].description.trim().toLowerCase()});
-	}
-	return array;
-    })(game_data.situations);
-    
-    game.save(function(a){});
-    
-    for (var sit in game.locations) {
-	GameLocation.findById(sit.id, function(situation) {
-	    situation.games.push({game_id:game._id, title:game_data.name});
-	    situation.save(function(a){});
-	});
-    }
-    
+    // UT
+    set_game(game, game_data);
+    game.save(function(a){});    
     res.send([]);
 });
 
