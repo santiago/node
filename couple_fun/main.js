@@ -58,6 +58,13 @@ app.post('/admin/couple_fun/games', function(req, res) {
     res.send([]);
 });
 
+app.del('/admin/couple_fun/games/*', function(req, res) {
+    Game.findById(req.params[0], function(game) {
+    	game.remove(function(a) {});
+    });    
+    res.send([]);
+});
+
 app.get('/couple_fun/games/*', function(req, res) {
     Game.findById(req.params[0], function(game) {
 	res.send(clean_for_json(game));
