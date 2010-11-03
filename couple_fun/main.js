@@ -55,7 +55,7 @@ app.post('/admin/couple_fun/games', function(req, res) {
     // UT
     set_game(game, game_data);
     game.save(function(a){});    
-    res.send([]);
+    res.send(clean_for_json(game));
 });
 
 app.del('/admin/couple_fun/games/*', function(req, res) {
