@@ -51,10 +51,12 @@ app.put('/admin/couple_fun/games', function(req, res) {
 
 app.post('/admin/couple_fun/games', function(req, res) {
     var game_data= req.param('game');
+    console.log(game_data);
     var game = new Game();
     // UT
     set_game(game, game_data);
     game.save(function(a){});    
+    console.log(clean_for_json(game));
     res.send(clean_for_json(game));
 });
 
